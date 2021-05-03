@@ -17,7 +17,7 @@ def mean_squared_error_score(n_estimators: int):
     pipeline = Pipeline(steps=[
         ('preprocessor', preprocessor),
         ('model', RandomForestRegressor(n_estimators=n_estimators, random_state=235))])
-    scores = -1 * cross_val_score(pipeline, X, y, cv=3, scoring='neg_mean_absolute_error')
+    scores = -1 * cross_val_score(pipeline, X, y, cv=5, scoring='neg_mean_absolute_error')
     return scores.mean()
 
 X = pd.read_csv('./data/train.csv')

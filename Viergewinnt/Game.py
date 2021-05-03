@@ -10,7 +10,7 @@ class Viergewinnt:
     def __init__(self):
         pass
 
-    def start_game(self,nrows=6, ncols=9):
+    def start_game(self,nrows=6, ncols=9, inarow=4):
         """
         Creates a new game instance
         """
@@ -19,27 +19,12 @@ class Viergewinnt:
 
         self.nrows = nrows
         self.ncols = ncols
+        self.inarow = inarow
 
         self.board = np.zeros((nrows,ncols), dtype=np.uint8)
         self.player = 1
         self.last_col = 0
         self.move_count = 0
-
-    def start_testgame(self,nrows=6, ncols=8):
-        """
-        Creates a new game instance
-        """
-        self.nrows = nrows
-        self.ncols = ncols
-
-        self.board = np.zeros((nrows,ncols), dtype=np.uint8)
-        self.player = 1
-        self.board[0,2]=2
-        self.board[1, 3] = 2
-        self.board[2, 4] = 2
-        self.board[3, 5] = 1
-        self.print_board()
-        self.check_win()
 
 
     def gameplay(self, strategy) -> int:
@@ -121,7 +106,7 @@ class Viergewinnt:
         cols = [c for c in range(self.ncols) if self.check_drop(c)]
 
         x = random.choice(cols)
-        self.drop(x, self.player)
+        self.drop(self.board, x, self.player)
 
     def str_left(self):
         """
@@ -138,7 +123,7 @@ class Viergewinnt:
         Place in middle
         """
         # get all columns with at least one empty slot
-        if not self.drop(self.ncols // 2, self.player):
+        if not self.drop(self.board, self.ncols // 2, self.player):
             self.str_random()
 
     def check_drop(self,col):
@@ -150,13 +135,13 @@ class Viergewinnt:
     def print_board(self):
         print(self.board)
 
-    def drop(self, col, player):
+    def drop(self, board, col, player):
         if col < 0 or col >= self.ncols:
             return False
 
         for row in range(self.nrows-1,-1,-1):
-            if self.board[row,col] == 0:
-                self.board[row, col] = player
+            if board[row,col] == 0:
+                board[row, col] = player
                 self.last_row = row
                 self.last_col = col
                 self.move_count += 1
@@ -164,6 +149,31 @@ class Viergewinnt:
 
         #print(f'Col {col} is full')
         return False
+
+    def heuristic_score(self, col, window_size, player):
+        board = self.board.copy()
+        self.drop(board, col, player)
+
+        # horicontal
+        for row in range(self.nrows):
+            for col in range(0, self.ncols - self.inarow):
+                window = board[row, col:col + self.inarow]
+                print(window.sum())
+
+        # vertical
+        for col in range(self.ncols):
+            for row in range(0, self.nrows - self.inarow):
+                window = board[row, col:col + self.inarow]
+                print(window.sum())
+
+    def testing(self):
+        self.start_game()
+        self.drop(self.board,1,1)
+        self.drop(self.board, 3, 1)
+        self.drop(self.board, 4, 1)
+        self.print_board()
+        self.heuristic_score(4)
+
 
     def check_win(self):
         # vertical
@@ -234,30 +244,19 @@ class Viergewinnt:
         return False
 
     def str_mimic(self):
-        if not self.drop(self.last_col, self.player):
+        if not self.drop(self.board, self.last_col, self.player):
             self.str_random()
 
     def str_mimic_next(self):
-        if not self.drop(self.last_col + 1, self.player):
+        if not self.drop(self.board, self.last_col + 1, self.player):
             self.str_random()
 
     def str_manual(self):
         self.print_board()
         x = input('Welche column? ')
-        self.drop(int(x)-1, self.player)
+        self.drop(self.board, int(x)-1, self.player)
         self.print_board()
 
-    def testing(self):
-        self.drop(0, 2)
-        print(self.check_win())
-        self.drop(1, 2)
-        print(self.check_win())
-        self.drop(2, 2)
-        print(self.check_win())
-        self.drop(7, 2)
-        print(self.check_win())
-        self.check_win()
-        self.print_board()
 
     def paint_board(self):
         self.print_board()

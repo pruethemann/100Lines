@@ -34,7 +34,7 @@ for code in codes:
     print(response.url)
 
 
-"""
+
 for code in codes:
     site = url + code
 
@@ -58,4 +58,3 @@ for code in codes:
                 url = '{}{}'.format(site, url)
             response = requests.get(url)
             f.write(response.content)
-"""

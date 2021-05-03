@@ -8,5 +8,6 @@ g = Viergewinnt()
 #g.print_board()
 
 game_strategies = ['middle', 'random']
-g.competition(10, game_strategies)
+#g.competition(10, game_strategies)
 #g.start_testgame()
+g.testing()
